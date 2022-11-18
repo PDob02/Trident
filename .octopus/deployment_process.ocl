@@ -7,7 +7,6 @@ step "deploy-a-package" {
 
     action "remove-from-load-balancer" {
         action_type = "Octopus.Script"
-        environments = ["staging", "production"]
         name = "Remove from Load Balancer"
         properties = {
             Octopus.Action.RunOnServer = "false"
