@@ -17,10 +17,11 @@ step "deploy-a-package" {
                 
                 $number = Get-Random -Maximum 10
                 Write-Host "The random number is $number"
-                if ($number -ge 8)
+                if ($number -ge 5)
                 {
-                Write-Host "Forcing an error for reasons."
-                Exit 1
+                 Write-Host "Forcing an error for reasons."
+                 Exit 1
+                }
             EOT
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
