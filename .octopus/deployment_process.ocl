@@ -15,6 +15,10 @@ step "deploy-a-package" {
                 
                 Write-Host "Remove $machineName from the Load Balancers."
                 
+                $number = Get-Random -Maximum 10
+                Write-Host "The random number is $number"
+                if ($number -ge 8)
+                {
                 Write-Host "Forcing an error for reasons."
                 Exit 1
             EOT
