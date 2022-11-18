@@ -7,6 +7,7 @@ step "deploy-a-package" {
 
     action "remove-from-load-balancer" {
         action_type = "Octopus.Script"
+        environments = ["staging", "production"]
         name = "Remove from Load Balancer"
         properties = {
             Octopus.Action.RunOnServer = "false"
@@ -14,14 +15,6 @@ step "deploy-a-package" {
                 $machineName = $OctopusParameters["Octopus.Machine.Name"]
                 
                 Write-Host "Remove $machineName from the Load Balancers."
-                
-                $number = Get-Random -Maximum 10
-                Write-Host "The random number is $number"
-                if ($number -ge 5)
-                {
-                 Write-Host "Forcing an error for reasons."
-                 Exit 1
-                }
             EOT
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
