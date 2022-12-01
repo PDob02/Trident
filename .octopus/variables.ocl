@@ -1,44 +1,9 @@
-variable "ConnectionStrings:Database" {
-    value "Server=#{Project.Database.Server.Name};Database=#{Project.Database.Name};User ID=#{Project.Database.User.Name};Password=#{Project.Database.User.Password};" {}
-}
-
 variable "Project.Database.Name" {
     value "Trident" {}
-}
 
-variable "Project.Database.Server.Name" {
-    value "Trident_Dev" {
-        environment = ["development"]
-    }
-
-    value "Trident_QA" {
-        environment = ["qa"]
-    }
-
-    value "Trident_Staging" {
-        environment = ["staging"]
-    }
-
-    value "Trident_Prod " {
-        environment = ["production"]
-    }
-}
-
-variable "Project.Database.User.Name" {
-    value "Trident_User_Dev" {
-        environment = ["development"]
-    }
-
-    value "Trident_User_QA" {
-        environment = ["qa"]
-    }
-
-    value "Trident_User_Staging" {
-        environment = ["staging"]
-    }
-
-    value "Trident_User_Prod" {
-        environment = ["production"]
+    value "Trident_#{Octopus.Environment.Name}" {
+        description = ""
+        environment = ["development", "qa", "staging"]
     }
 }
 
@@ -46,4 +11,24 @@ variable "Octopus.ServiceNow.ChangeRequest.Number" {
     value "CHG0030001" {
         environment = ["production"]
     }
+}
+
+variable "Project.Database.Report.Path" {
+    value "C:\\DatabaseReports\\#{Octopus.Environment.Name}" {}
+}
+
+variable "Project.Database.ApprovalRequired" {
+    value "#{Octopus.Action[Auto-Approve Database Delta Script].Output.ApprovalRequired}" {}
+}
+
+variable "Project.Connection.String" {
+    value "Server=#{Project.Database.Server.Name};Integrated Security=true;Database=#{Project.Database.Name}" {}
+}
+
+variable "ConnectionStrings:Database" {
+    value "#{Project.Connection.String}" {}
+}
+
+variable "Project.Database.Server.Name" {
+    value "(localdb)\\MSSQLLocalDB" {}
 }
