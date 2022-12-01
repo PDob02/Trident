@@ -1,3 +1,29 @@
+step "run-the-trident-database-creation-runbook" {
+    name = "Run the Trident Database Creation Runbook"
+
+    action {
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Template.Id = "ActionTemplates-23"
+            Octopus.Action.Template.Version = "14"
+            Run.Runbook.Api.Key = "#{Project.Runbook.Api.Key}"
+            Run.Runbook.AutoApproveManualInterventions = "No"
+            Run.Runbook.Base.Url = "#{Octopus.Web.ServerUri}"
+            Run.Runbook.CancelInSeconds = "1800"
+            Run.Runbook.DateTime = "N/A"
+            Run.Runbook.Environment.Name = "#{Octopus.Environment.Name}"
+            Run.Runbook.Machines = "N/A"
+            Run.Runbook.ManualIntervention.EnvironmentToUse = "#{Octopus.Environment.Name}"
+            Run.Runbook.Name = "Create Trident Database"
+            Run.Runbook.Project.Name = "Trident"
+            Run.Runbook.Space.Name = "#{Octopus.Space.Name}"
+            Run.Runbook.UsePublishedSnapShot = "True"
+            Run.Runbook.Waitforfinish = "True"
+        }
+        worker_pool = "default-worker-pool-1"
+    }
+}
+
 step "deploy-a-package" {
     name = "Deploy Trident Website"
     properties = {
