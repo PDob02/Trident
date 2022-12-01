@@ -24,6 +24,45 @@ step "run-the-trident-database-creation-runbook" {
     }
 }
 
+step "generate-database-delta-report" {
+    name = "Generate Database Delta Report"
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $packagePath = $OctopusParameters["Octopus.Action.Package[Trident.Database].ExtractedPath"]
+                $connectionString = $OctopusParameters["Project.Connection.String"]
+                $environmentName = $OctopusParameters["Octopus.Environment.Name"]
+                $reportPath = $OctopusParameters["Project.Database.Report.Path"]
+                
+                cd $packagePath
+                $appToRun = ".\Octopus.Trident.Database.DbUp"
+                $generatedReport = "$reportPath\UpgradeReport.html"
+                
+                & $appToRun --ConnectionString="$connectionString" --PreviewReportPath="$reportPath"
+                
+                New-OctopusArtifact -Path "$generatedReport" -Name "$environmentName.UpgradeReport.html"
+            EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        worker_pool = "default-worker-pool-1"
+
+        packages "Trident.Database" {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "Trident.Database"
+            properties = {
+                Extract = "True"
+                Purpose = ""
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
 step "deploy-a-package" {
     name = "Deploy Trident Website"
     properties = {
