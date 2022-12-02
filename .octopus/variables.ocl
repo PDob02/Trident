@@ -30,5 +30,5 @@ variable "Project.Database.Server.Name" {
 }
 
 variable "Project.Database.ApprovalRequired" {
-    value "#{Octopus.Action[Generate Database Delta Report].Output.ApprovalRequired}" {}
+    value "#{Octopus.Action[Auto-Approve Database Delta Script].Output.ApprovalRequired}" {}
 }
