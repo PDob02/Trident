@@ -72,7 +72,7 @@ step "auto-approve-database-delta-script" {
         properties = {
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Template.Id = "ActionTemplates-24"
-            Octopus.Action.Template.Version = "0"
+            Octopus.Action.Template.Version = "1"
         }
         worker_pool = "default-worker-pool-1"
     }
