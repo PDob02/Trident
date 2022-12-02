@@ -25,11 +25,7 @@ step "run-the-trident-database-creation-runbook" {
 }
 
 step "generate-database-delta-report" {
-    condition = "Variable"
     name = "Generate Database Delta Report"
-    properties = {
-        Octopus.Step.ConditionVariableExpression = "#{if Octopus.Deployment.Error == \"\"}#{Project.Database.ApprovalRequired}#{/if}"
-    }
 
     action {
         action_type = "Octopus.Script"
@@ -97,7 +93,11 @@ step "generate-database-delta-report" {
 }
 
 step "approve-database-delta-script" {
+    condition = "Variable"
     name = "Approve Database Delta Script"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{if Octopus.Deployment.Error == \"\"}#{Project.Database.ApprovalRequired}#{/if}"
+    }
 
     action {
         action_type = "Octopus.Manual"
