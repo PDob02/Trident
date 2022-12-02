@@ -34,7 +34,8 @@ step "generate-database-delta-report" {
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $packagePath = $OctopusParameters["Octopus.Action.Package[Trident.Database].ExtractedPath"]
                 $connectionString = $OctopusParameters["Project.Connection.String"]
-                $commandsToLookFor = $OctopusParameters["SQL.Verification.Command.List"]
+                $packagePath = $OctopusParameters["Octopus.Action.Package[Trident.Database].ExtractedPath"]
+                $connectionString = $OctopusParameters["Project.Connection.String"]
                 $environmentName = $OctopusParameters["Octopus.Environment.Name"]
                 $reportPath = $OctopusParameters["Project.Database.Report.Path"]
                 
@@ -45,34 +46,6 @@ step "generate-database-delta-report" {
                 & $appToRun --ConnectionString="$connectionString" --PreviewReportPath="$reportPath"
                 
                 New-OctopusArtifact -Path "$generatedReport" -Name "$environmentName.UpgradeReport.html"
-                
-                Write-Host "Looping through all commands"
-                $commandListToCheck = $CommandsToLookFor -split ","
-                $ApprovalRequired = $false
-                
-                $fileContent = Get-Content -path $generatedReport
-                foreach ($command in $commandListToCheck)
-                {
-                    Write-Host "Checking $($sqlFile.FileName) for command $command"
-                    $foundCommand = $fileContent -match "$command"
-                
-                    if ($foundCommand)
-                    {
-                        Write-Highlight "$($sqlFile.FileName) has the command '$command'"
-                        $ApprovalRequired = $true
-                    }
-                }
-                
-                if ($approvalRequired -eq $false)
-                {
-                    Write-Highlight "All scripts look good"
-                }
-                else
-                {
-                    Write-Highlight "One of the specific commands we look for has been found"
-                }
-                
-                Set-OctopusVariable -name "ApprovalRequired" -value $ApprovalRequired
             EOT
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
@@ -89,6 +62,22 @@ step "generate-database-delta-report" {
                 SelectionMode = "immediate"
             }
         }
+    }
+}
+
+step "auto-approve-database-delta-script" {
+    name = "Auto-Approve Database Delta Script"
+
+    action {
+        properties = {
+            Databases.AutoApproval.ReportPath = "#{Project.Database.Report.Path}\\UpgradeReport.html"
+            Databases.AutoApprove.CommandsIndicatingChange = "﻿#{SQL.Verification.Change.List}"
+            Databases.AutoApprove.CommandsRequireApproval = "#{SQL.Verification.Command.List}"
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Template.Id = "ActionTemplates-24"
+            Octopus.Action.Template.Version = "1"
+        }
+        worker_pool = "default-worker-pool-1"
     }
 }
 
