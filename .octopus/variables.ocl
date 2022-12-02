@@ -17,10 +17,6 @@ variable "Project.Database.Report.Path" {
     value "C:\\DatabaseReports\\#{Octopus.Environment.Name}" {}
 }
 
-variable "Project.Database.ApprovalRequired" {
-    value "#{Octopus.Action[Auto-Approve Database Delta Script].Output.ApprovalRequired}" {}
-}
-
 variable "Project.Connection.String" {
     value "Server=#{Project.Database.Server.Name};Integrated Security=true;Database=#{Project.Database.Name}" {}
 }
@@ -31,4 +27,8 @@ variable "ConnectionStrings:Database" {
 
 variable "Project.Database.Server.Name" {
     value "(localdb)\\MSSQLLocalDB" {}
+}
+
+variable "Project.Database.ApprovalRequired" {
+    value "#{Octopus.Action[Generate Database Delta Report].Output.ApprovalRequired}" {}
 }

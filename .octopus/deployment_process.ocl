@@ -24,6 +24,93 @@ step "run-the-trident-database-creation-runbook" {
     }
 }
 
+step "generate-database-delta-report" {
+    name = "Generate Database Delta Report"
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $packagePath = $OctopusParameters["Octopus.Action.Package[Trident.Database].ExtractedPath"]
+                $connectionString = $OctopusParameters["Project.Connection.String"]
+                $environmentName = $OctopusParameters["Octopus.Environment.Name"]
+                $reportPath = $OctopusParameters["Project.Database.Report.Path"]
+                
+                cd $packagePath
+                $appToRun = ".\Octopus.Trident.Database.DbUp"
+                $generatedReport = "$reportPath\UpgradeReport.html"
+                
+                & $appToRun --ConnectionString="$connectionString" --PreviewReportPath="$reportPath"
+                
+                New-OctopusArtifact -Path "$generatedReport" -Name "$environmentName.UpgradeReport.html"
+            EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        worker_pool = "default-worker-pool-1"
+
+        packages "Trident.Database" {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "Trident.Database"
+            properties = {
+                Extract = "True"
+                Purpose = ""
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
+step "approve-database-delta-script" {
+    name = "Approve Database Delta Script"
+
+    action {
+        action_type = "Octopus.Manual"
+        properties = {
+            Octopus.Action.Manual.BlockConcurrentDeployments = "True"
+            Octopus.Action.Manual.Instructions = "Please approve the database Delta script found in the artifacts sections"
+            Octopus.Action.Manual.ResponsibleTeamIds = "dba-team,global/octopus-managers"
+        }
+        worker_pool_variable = ""
+    }
+}
+
+step "deploy-the-database-changes" {
+    name = "Deploy the Database Changes"
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $packagePath = $OctopusParameters["Octopus.Action.Package[Trident.Database].ExtractedPath"]
+                $connectionString = $OctopusParameters["Project.Connection.String"]
+                
+                cd $packagePath
+                $appToRun = ".\Octopus.Trident.Database.DbUp"
+                
+                & $appToRun --ConnectionString="$connectionString"
+            EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        worker_pool = "default-worker-pool-1"
+
+        packages "Trident.Database" {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "Trident.Database"
+            properties = {
+                Extract = "True"
+                Purpose = ""
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
 step "deploy-a-package" {
     name = "Deploy Trident Website"
     properties = {
@@ -90,7 +177,7 @@ step "deploy-a-package" {
 
 step "send-an-email" {
     condition = "Always"
-    name = "Send an Email"
+    name = "Notify Developers of Status"
 
     action {
         action_type = "Octopus.Email"
@@ -105,7 +192,7 @@ step "send-an-email" {
 
 step "slack-send-simple-notification" {
     condition = "Failure"
-    name = "Slack - Send Simple Notification"
+    name = "Send Slack Message on Failure"
     properties = {
         Octopus.Action.TargetRoles = "trident-web"
     }
