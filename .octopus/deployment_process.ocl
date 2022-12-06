@@ -1,9 +1,5 @@
 step "calculate-deployment-mode" {
-    condition = "Variable"
     name = "Calculate Deployment Mode"
-    properties = {
-        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}"
-    }
 
     action {
         properties = {
