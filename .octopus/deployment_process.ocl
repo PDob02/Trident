@@ -226,3 +226,21 @@ step "disable-maintenance-mode" {
         worker_pool = "default-worker-pool-1"
     }
 }
+
+step "manual-intervention-required" {
+    name = "Manual Intervention Required"
+
+    action {
+        action_type = "Octopus.Manual"
+        properties = {
+            Octopus.Action.Manual.BlockConcurrentDeployments = "False"
+            Octopus.Action.Manual.Instructions = <<-EOT
+                Add a manual verification step to verify the application
+                Assign it to QA and Octopus Managers
+                
+            EOT
+            Octopus.Action.Manual.ResponsibleTeamIds = "qa-team,global/octopus-managers"
+        }
+        worker_pool_variable = ""
+    }
+}
