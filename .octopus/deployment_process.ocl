@@ -102,6 +102,21 @@ step "auto-approve-database-delta-script" {
     }
 }
 
+step "enable-maintenance-mode" {
+    name = "Enable Maintenance Mode"
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = "Write-Host \"Enable Maintenance Mode\""
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        worker_pool = "default-worker-pool-1"
+    }
+}
+
 step "approve-database-delta-script" {
     condition = "Variable"
     name = "Approve Database Delta Script"
@@ -197,36 +212,6 @@ step "slack-send-simple-notification" {
     }
 }
 
-step "enable-maintenance-mode" {
-    name = "Enable Maintenance Mode"
-
-    action {
-        action_type = "Octopus.Script"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = "Write-Host \"Enable Maintenance Mode\""
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "default-worker-pool-1"
-    }
-}
-
-step "disable-maintenance-mode" {
-    name = "Disable Maintenance Mode"
-
-    action {
-        action_type = "Octopus.Script"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = "Write-Host \"Disable Maintenance Mode\""
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "default-worker-pool-1"
-    }
-}
-
 step "manual-intervention-required" {
     name = "Manual Intervention Required"
 
@@ -242,5 +227,20 @@ step "manual-intervention-required" {
             Octopus.Action.Manual.ResponsibleTeamIds = "qa-team,global/octopus-managers"
         }
         worker_pool_variable = ""
+    }
+}
+
+step "disable-maintenance-mode" {
+    name = "Disable Maintenance Mode"
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = "Write-Host \"Disable Maintenance Mode\""
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        worker_pool = "default-worker-pool-1"
     }
 }
