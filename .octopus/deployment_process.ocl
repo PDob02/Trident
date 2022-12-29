@@ -133,6 +133,7 @@ step "approve-database-delta-script" {
             Octopus.Action.Manual.Instructions = "Please approve the database Delta script found in the artifacts sections"
             Octopus.Action.Manual.ResponsibleTeamIds = "dba-team,global/octopus-managers"
         }
+        tenant_tags = ["Branch Type/Pseudo"]
         worker_pool_variable = ""
     }
 }
