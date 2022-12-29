@@ -1,6 +1,4 @@
 variable "Project.Database.Name" {
-    value "Trident" {}
-
     value "Trident_#{Octopus.Environment.Name}_#{Retail.Tenant.ShortName}" {
         description = ""
         environment = ["development", "qa", "staging"]
