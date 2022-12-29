@@ -91,6 +91,7 @@ step "auto-approve-database-delta-script" {
     }
 
     action {
+        environments = ["staging"]
         properties = {
             Databases.AutoApproval.ReportPath = "#{Project.Database.Report.Path}\\UpgradeReport.html"
             Databases.AutoApprove.CommandsIndicatingChange = "﻿#{SQL.Verification.Change.List}"
